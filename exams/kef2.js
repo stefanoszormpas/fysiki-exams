@@ -283,6 +283,78 @@
     ]
   };
 
+
+  /* ===== Ερωτήσεις με σχήμα ===== */
+  const GT = { fr: "Lecture de graphiques", el: "Ανάγνωση γραφημάτων" };
+  const figVT = l => FIG.graph({ xmax: 10, ymax: 10, xstep: 1, ystep: 2, xlabel: "t (s)", ylabel: "v (m/s)",
+    lines: [{ pts: [[0, 0], [4, 8], [8, 8], [10, 0]] }] }, l);
+  const figFT = l => FIG.graph({ xmax: 4, ymax: 8, xstep: 1, ystep: 2, xlabel: "t (s)", ylabel: "F (N)",
+    lines: [{ pts: [[0, 6], [2, 6], [4, 0]] }] }, l);
+  const F1 = {
+    id: "f1", type: "numeric", topic: GT, diff: 1, unit: "m/s²", figure: figVT,
+    stem: { fr: R`Le graphique donne la vitesse d'un chariot en fonction du temps. Quelle est son accélération entre \(t=0\) et \(t=4\ \text{s}\) ?`,
+            el: R`Το γράφημα δίνει την ταχύτητα ενός βαγονιού σε συνάρτηση με τον χρόνο. Ποια είναι η επιτάχυνσή του από \(t=0\) έως \(t=4\) s;` },
+    answer: 2, tol: 0.01,
+    explain: { fr: R`\(a=\dfrac{\Delta v}{\Delta t}=\dfrac{8-0}{4-0}=2\ \text{m/s}^2\) (pente de la droite).`,
+               el: R`\(a=\dfrac{\Delta v}{\Delta t}=\dfrac{8-0}{4-0}=2\) m/s² (κλίση της ευθείας).` }
+  };
+  const F2 = {
+    id: "f2", type: "numeric", topic: GT, diff: 2, unit: "m", figure: figVT,
+    stem: { fr: R`Quelle distance le chariot parcourt-il entre \(t=0\) et \(t=10\ \text{s}\) ?`,
+            el: R`Ποια απόσταση διανύει το βαγόνι από \(t=0\) έως \(t=10\) s;` },
+    answer: 56, tol: 0.01,
+    explain: { fr: R`Distance = aire sous la courbe : \(\tfrac12\cdot4\cdot8+4\cdot8+\tfrac12\cdot2\cdot8=16+32+8=56\ \text{m}\).`,
+               el: R`Απόσταση = εμβαδό κάτω από την καμπύλη: \(\tfrac12\cdot4\cdot8+4\cdot8+\tfrac12\cdot2\cdot8=16+32+8=56\) m.` }
+  };
+  const F3 = {
+    id: "f3", type: "compare", topic: GT, diff: 2, figure: figVT,
+    stem: { fr: R`Le chariot a une masse de \(3\ \text{kg}\).<br><b>Quantité A :</b> intensité de la force résultante entre \(t=0\) et \(t=4\ \text{s}\).<br><b>Quantité B :</b> intensité de la force résultante entre \(t=4\ \text{s}\) et \(t=8\ \text{s}\).`,
+            el: R`Το βαγόνι έχει μάζα 3 kg.<br><b>Ποσότητα Α:</b> μέτρο της συνισταμένης δύναμης από \(t=0\) έως \(t=4\) s.<br><b>Ποσότητα Β:</b> μέτρο της συνισταμένης δύναμης από \(t=4\) s έως \(t=8\) s.` },
+    answer: 0,
+    explain: { fr: R`Entre 0 et 4 s : \(a=2\ \text{m/s}^2\), donc \(F=ma=6\ \text{N}\). Entre 4 et 8 s : vitesse constante, \(a=0\), donc \(F=0\). A \(>\) B.`,
+               el: R`Από 0 έως 4 s: \(a=2\) m/s², άρα \(F=ma=6\) N. Από 4 έως 8 s: σταθερή ταχύτητα, \(a=0\), άρα \(F=0\). Α \(>\) Β.` }
+  };
+  const F4 = {
+    id: "f4", type: "numeric", topic: GT, diff: 2, unit: "N·s", figure: figFT,
+    stem: { fr: R`Le graphique donne la force horizontale qui s'exerce sur un chariot pendant \(4\ \text{s}\). Quelle est l'impulsion de cette force ?`,
+            el: R`Το γράφημα δίνει την οριζόντια δύναμη που ασκείται σε ένα βαγόνι για 4 s. Ποια είναι η ώθηση της δύναμης;` },
+    answer: 18, tol: 0.01,
+    explain: { fr: R`Impulsion = aire sous la courbe \(F(t)\) : rectangle \(6\cdot2=12\) + triangle \(\tfrac12\cdot2\cdot6=6\), soit \(18\ \text{N·s}\).`,
+               el: R`Ώθηση = εμβαδό κάτω από την \(F(t)\): ορθογώνιο \(6\cdot2=12\) + τρίγωνο \(\tfrac12\cdot2\cdot6=6\), δηλαδή \(18\) N·s.` }
+  };
+  const F5 = {
+    id: "f5", type: "numeric", topic: GT, diff: 3, unit: "m/s", figure: figFT,
+    stem: { fr: R`Le chariot a une masse de \(3\ \text{kg}\) et part du repos. Quelle est sa vitesse à \(t=4\ \text{s}\) ?`,
+            el: R`Το βαγόνι έχει μάζα 3 kg και ξεκινά από την ηρεμία. Ποια είναι η ταχύτητά του τη στιγμή \(t=4\) s;` },
+    answer: 6, tol: 0.01,
+    explain: { fr: R`\(I=\Delta p=m\,v_f-0\Rightarrow v_f=\dfrac{18}{3}=6\ \text{m/s}\).`,
+               el: R`\(I=\Delta p=m\,v_τ-0\Rightarrow v_τ=\dfrac{18}{3}=6\) m/s.` }
+  };
+  const F6 = {
+    id: "f6", type: "numeric", topic: TOP.incline, diff: 2, unit: "N",
+    figure: l => FIG.incline({ angle: 30, mass: "5 kg", rope: { fr: "fil", el: "σχοινί" } }, l),
+    stem: { fr: R`Un bloc de \(5\ \text{kg}\) est maintenu immobile sur un plan incliné de \(30^\circ\), sans frottement, par un fil parallèle au plan. Quelle est la tension du fil ? (\(g=10\ \text{m/s}^2\))`,
+            el: R`Σώμα 5 kg συγκρατείται ακίνητο σε κεκλιμένο επίπεδο 30°, χωρίς τριβή, με σχοινί παράλληλο στο επίπεδο. Ποια είναι η τάση του σχοινιού;` },
+    answer: 25, tol: 0.01,
+    explain: { fr: R`Équilibre le long du plan : \(T=mg\sin30^\circ=5\cdot10\cdot0{,}5=25\ \text{N}\).`,
+               el: R`Ισορροπία κατά μήκος του επιπέδου: \(T=mg\sin30^\circ=5\cdot10\cdot0{,}5=25\) N.` }
+  };
+  const F7 = {
+    id: "f7", type: "numeric", topic: TOP.collision, diff: 3, unit: "m/s",
+    figure: l => FIG.collision({
+      before: [{ x: 130, w: 70, m: "3 kg", v: "5 m/s", dir: 1 }, { x: 390, w: 56, m: "2 kg", v: "5 m/s", dir: -1 }],
+      after: [{ x: 260, w: 100, m: "3 kg + 2 kg", v: "v′ = ?", dir: 0 }] }, l),
+    stem: { fr: R`Deux chariots se heurtent frontalement et restent accrochés. Le sens positif est vers la droite. Quelle est la vitesse \(v'\) des chariots après le choc ?`,
+            el: R`Δύο βαγονάκια συγκρούονται μετωπικά και παραμένουν ενωμένα. Θετική φορά προς τα δεξιά. Ποια είναι η ταχύτητα \(v'\) μετά την κρούση;` },
+    answer: 1, tol: 0.01,
+    explain: { fr: R`\(3\cdot5+2\cdot(-5)=(3+2)\,v'\Rightarrow v'=\dfrac{5}{5}=1\ \text{m/s}\), vers la droite.`,
+               el: R`\(3\cdot5+2\cdot(-5)=(3+2)\,v'\Rightarrow v'=\dfrac{5}{5}=1\) m/s, προς τα δεξιά.` }
+  };
+  { const s1 = exam.sections[0].questions, s2 = exam.sections[1].questions;
+    s1.splice(3, 0, F1, F2, F3); s1.splice(9, 0, F6);
+    s2.splice(2, 0, F4, F5); s2.splice(7, 0, F7);
+    exam.sections[0].minutes = 22; exam.sections[1].minutes = 20; }
+
   window.EXAMS = window.EXAMS || [];
   window.EXAMS.push(exam);
 })();
