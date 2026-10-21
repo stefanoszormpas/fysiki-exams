@@ -13,6 +13,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'glo
 <script src="exams/figs.js"></script>
 <script src="exams/kef1.js"></script>
 <script src="exams/kef2.js"></script>
+<script src="exams/gr-b1.js"></script>
 <style>
 :root{
   --navy:#1c3a5e; --teal:#0f6e6b; --amber:#a9631a;
@@ -127,8 +128,8 @@ h1{font-size:1.5rem} h2{font-size:1.2rem} h3{font-size:1.02rem}
 /* ===== Βοηθητικά ===== */
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let LANG = 'both';
-try { const l = localStorage.getItem('fx_lang'); if (['fr','el','both'].includes(l)) LANG = l; } catch (e) {}
+let LANG = 'both', UL = 'both';
+try { const l = localStorage.getItem('fx_lang'); if (['fr','el','both'].includes(l)) LANG = UL = l; } catch (e) {}
 
 const UI = {
   title: { fr: "Examens de physique", el: "Εξετάσεις Φυσικής" },
@@ -281,11 +282,11 @@ function go(i) { S.qi = i; S.phase = 'q'; S.confirm = false; render(); window.sc
 function langBar() {
   return `<div class="langs">${['fr','el','both'].map(l => `<button class="${LANG===l?'on':''}" onclick="setLang('${l}')">${{fr:'Français',el:'Ελληνικά',both:'FR + ΕΛ'}[l]}</button>`).join('')}</div>`;
 }
-function setLang(l) { LANG = l; try { localStorage.setItem('fx_lang', l); } catch (e) {} render(); }
+function setLang(l) { LANG = UL = l; try { localStorage.setItem('fx_lang', l); } catch (e) {} render(); }
 
 const L = x => typeof x === 'string' ? x : LANG === 'fr' ? x.fr : LANG === 'el' ? x.el : x.fr + ' · ' + x.el;
 function topbar(showTimer) {
-  const ex = S.exam;
+  const ex = S.phase === 'home' ? null : S.exam;
   const left = Math.max(0, Math.round((S.deadline - Date.now()) / 1000));
   const t1 = ex ? L(ex.title) : L(UI.title);
   const t2 = ex ? (showTimer ? L(curSec().name) : L(ex.subtitle)) : '';
@@ -296,13 +297,14 @@ function topbar(showTimer) {
         ${S.hideTimer ? '' : `<span id="timer" class="timer ${left<=300?'low':''}">${fmt(left)}</span>`}
         <button class="tbtn" onclick="S.modal='formulas';render()">∑ ${L(UI.formulas)}</button>
         <button class="tbtn" onclick="S.modal='calc';render()">▦ ${L(UI.calc)}</button>` : ''}
-      ${langBar()}
+      ${ex && ex.lang && S.phase !== 'home' ? '' : langBar()}
     </div></div>`;
 }
 
 function render() {
   const root = $('#root');
   const ph = S.phase;
+  LANG = (S.exam && ph !== 'home' && S.exam.lang) || UL;
   let h = '';
   if (ph === 'home') h = topbar(false) + home();
   else if (ph === 'intro') h = topbar(false) + intro();
@@ -320,13 +322,19 @@ let _focus = null;
 function restoreFocus() { if (_focus) { const i = $('#numin'); if (i) { i.focus(); const l = i.value.length; i.setSelectionRange(l, l); } _focus = null; } }
 
 function home() {
-  const items = (window.EXAMS || []).slice().sort((a, b) => a.chapter - b.chapter).map(e => {
+  const DEF = 'Physique 2CB/2CC — Luxembourg';
+  const exs = (window.EXAMS || []).slice();
+  const groups = [...new Set(exs.map(e => e.group || DEF))].sort((a, b) => (a === DEF ? -1 : b === DEF ? 1 : a.localeCompare(b)));
+  const item = e => {
+    const el = e.lang === 'el';
     const n = e.sections.reduce((a, s) => a + s.questions.length, 0);
     const m = e.sections.reduce((a, s) => a + s.minutes, 0);
-    return `<button class="exitem" onclick="openExam('${e.id}')"><div><div class="n">${LANG==='el'?'Κεφάλαιο':'Chapitre'} ${e.chapter} — ${B(e.title)}</div>
-      <div class="muted">${n} ${LANG==='el'?'ερωτήσεις':'questions'} · ${e.sections.length} ${LANG==='el'?'ενότητες':'sections'} · ${m} ${LANG==='el'?'λεπτά':'min'}</div></div><span class="btn pri">${L(UI.start)}</span></button>`;
-  }).join('');
-  return `<div class="wrap"><div class="card"><h1>${L(UI.pick)}</h1><div class="exlist" style="margin-top:14px">${items || '<p class="muted">—</p>'}</div></div>
+    const gr = el || LANG === 'el';
+    return `<button class="exitem" onclick="openExam('${e.id}')"><div><div class="n">${gr ? 'Κεφάλαιο' : 'Chapitre'} ${e.chapter} — ${el ? e.title : B(e.title)}</div>
+      <div class="muted">${n} ${gr ? 'ερωτήσεις' : 'questions'} · ${e.sections.length} ${gr ? 'ενότητες' : 'sections'} · ${m} ${gr ? 'λεπτά' : 'min'}</div></div><span class="btn pri">${el ? 'Έναρξη' : L(UI.start)}</span></button>`;
+  };
+  const items = groups.map((g, i) => `${groups.length > 1 ? `<h2 style="margin:${i ? 22 : 4}px 0 8px">${g}</h2>` : ''}<div class="exlist">${exs.filter(e => (e.group || DEF) === g).sort((a, b) => a.chapter - b.chapter).map(item).join('')}</div>`).join('');
+  return `<div class="wrap"><div class="card"><h1>${L(UI.pick)}</h1><div style="margin-top:14px">${items || '<p class="muted">—</p>'}</div></div>
     <div class="card"><h2>${L(UI.openres)}</h2><p class="muted" style="margin:4px 0 10px">${L(UI.openhelp)}</p>
       <textarea id="vcode" rows="3" style="width:100%;font:inherit;padding:10px;border:1.5px solid var(--line);border-radius:10px" oninput="S.vcode=this.value">${esc(S.vcode)}</textarea>
       ${S.verr ? `<p style="color:var(--bad);margin:6px 0 0">${L(UI.badcode)}</p>` : ''}
