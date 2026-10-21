@@ -12,25 +12,37 @@ window.FIG = (function () {
 
   /* Γράφημα: o = {xmax,ymax,ymin,xstep,ystep,xlabel,ylabel,lines:[{pts,color}],dots:[[x,y]]} */
   function graph(o, lang) {
-    const W = o.w || 460, H = o.h || 290, L = 60, R = 24, Tp = 18, Bt = 54;
-    const pw = W - L - R, ph = H - Tp - Bt, ymin = o.ymin || 0;
-    const X = x => L + pw * x / o.xmax, Y = y => Tp + ph * (1 - (y - ymin) / (o.ymax - ymin));
-    let s = open(W, H, T(o.ylabel, lang) + ' / ' + T(o.xlabel, lang));
+    const bare = !!o.bare;
+    const W = o.w || 460, H = o.h || 290;
+    const L = bare ? 20 : 60, R = bare ? 20 : 24, Tp = bare ? 20 : 18, Bt = bare ? 20 : 54;
+    const pw = W - L - R, ph = H - Tp - Bt, ymin = o.ymin || 0, xmin = o.xmin || 0;
+    const X = x => L + pw * (x - xmin) / (o.xmax - xmin), Y = y => Tp + ph * (1 - (y - ymin) / (o.ymax - ymin));
+    let s = open(W, H, T(o.ylabel || '', lang) + ' ' + T(o.xlabel || '', lang));
     s += `<rect width="${W}" height="${H}" fill="#fff"/>`;
-    const nx = Math.round(o.xmax / o.xstep), ny = Math.round((o.ymax - ymin) / o.ystep);
-    for (let i = 0; i <= nx; i++) { const x = o.xstep * i;
-      s += `<line x1="${X(x)}" y1="${Y(ymin)}" x2="${X(x)}" y2="${Y(o.ymax)}" stroke="${C.grid}"/><text x="${X(x)}" y="${Y(ymin) + 18}" text-anchor="middle" fill="${C.axis}">${num(x)}</text>`; }
-    for (let j = 0; j <= ny; j++) { const y = ymin + o.ystep * j;
-      s += `<line x1="${X(0)}" y1="${Y(y)}" x2="${X(o.xmax)}" y2="${Y(y)}" stroke="${C.grid}"/><text x="${X(0) - 8}" y="${Y(y) + 4}" text-anchor="end" fill="${C.axis}">${num(y)}</text>`; }
-    s += `<line x1="${X(0)}" y1="${Y(ymin)}" x2="${X(o.xmax) + 8}" y2="${Y(ymin)}" stroke="${C.ink}" stroke-width="1.6"/>`;
-    s += `<line x1="${X(0)}" y1="${Y(ymin)}" x2="${X(0)}" y2="${Y(o.ymax) - 8}" stroke="${C.ink}" stroke-width="1.6"/>`;
-    s += `<polygon points="${X(o.xmax) + 12},${Y(ymin)} ${X(o.xmax) + 4},${Y(ymin) - 4} ${X(o.xmax) + 4},${Y(ymin) + 4}" fill="${C.ink}"/>`;
-    s += `<polygon points="${X(0)},${Y(o.ymax) - 12} ${X(0) - 4},${Y(o.ymax) - 4} ${X(0) + 4},${Y(o.ymax) - 4}" fill="${C.ink}"/>`;
-    (o.lines || []).forEach(l => { s += `<polyline fill="none" stroke="${l.color || C.a}" stroke-width="3.2" stroke-linejoin="round" points="${l.pts.map(p => X(p[0]) + ',' + Y(p[1])).join(' ')}"/>`; });
-    (o.dots || []).forEach(d => { s += `<circle cx="${X(d[0])}" cy="${Y(d[1])}" r="4" fill="${C.b}"/>`; });
-    s += `<text x="${L + pw / 2}" y="${H - 8}" text-anchor="middle" fill="${C.ink}" font-weight="600">${T(o.xlabel, lang)}</text>`;
-    s += `<text transform="translate(16 ${Tp + ph / 2}) rotate(-90)" text-anchor="middle" fill="${C.ink}" font-weight="600">${T(o.ylabel, lang)}</text></svg>`;
-    return s;
+    if (!bare) {
+      const nx = Math.round((o.xmax - xmin) / o.xstep), ny = Math.round((o.ymax - ymin) / o.ystep);
+      for (let i = 0; i <= nx; i++) { const x = xmin + o.xstep * i;
+        s += `<line x1="${X(x)}" y1="${Y(ymin)}" x2="${X(x)}" y2="${Y(o.ymax)}" stroke="${C.grid}"/><text x="${X(x)}" y="${Y(ymin) + 18}" text-anchor="middle" fill="${C.axis}">${num(x)}</text>`; }
+      for (let j = 0; j <= ny; j++) { const y = ymin + o.ystep * j;
+        s += `<line x1="${X(xmin)}" y1="${Y(y)}" x2="${X(o.xmax)}" y2="${Y(y)}" stroke="${C.grid}"/><text x="${X(xmin) - 8}" y="${Y(y) + 4}" text-anchor="end" fill="${C.axis}">${num(y)}</text>`; }
+      s += `<line x1="${X(xmin)}" y1="${Y(ymin)}" x2="${X(o.xmax) + 8}" y2="${Y(ymin)}" stroke="${C.ink}" stroke-width="1.6"/>`;
+      s += `<line x1="${X(xmin)}" y1="${Y(ymin)}" x2="${X(xmin)}" y2="${Y(o.ymax) - 8}" stroke="${C.ink}" stroke-width="1.6"/>`;
+      s += `<polygon points="${X(o.xmax) + 12},${Y(ymin)} ${X(o.xmax) + 4},${Y(ymin) - 4} ${X(o.xmax) + 4},${Y(ymin) + 4}" fill="${C.ink}"/>`;
+      s += `<polygon points="${X(xmin)},${Y(o.ymax) - 12} ${X(xmin) - 4},${Y(o.ymax) - 4} ${X(xmin) + 4},${Y(o.ymax) - 4}" fill="${C.ink}"/>`;
+    }
+    (o.lines || []).forEach(l => { s += `<polyline fill="none" stroke="${l.color || C.a}" stroke-width="3.2" stroke-linejoin="round" ${l.dash ? 'stroke-dasharray="6 5"' : ''} points="${l.pts.map(p => X(p[0]) + ',' + Y(p[1])).join(' ')}"/>`; });
+    (o.arrows || []).forEach(a => {
+      const x1 = X(a.p[0]), y1 = Y(a.p[1]), x2 = X(a.p[0] + a.d[0]), y2 = Y(a.p[1] + a.d[1]), col = a.color || C.b;
+      s += arrow(x1, y1, x2, y2, col, 2.8);
+      if (a.label) s += `<text x="${x2 + (a.dx ?? 8)}" y="${y2 + (a.dy ?? -8)}" fill="${col}" font-weight="700" font-size="15" font-style="italic">${T(a.label, lang)}</text>`;
+    });
+    (o.dots || []).forEach(d => { s += `<circle cx="${X(d[0])}" cy="${Y(d[1])}" r="4.5" fill="${C.b}"/>` + (d[2] ? `<text x="${X(d[0]) + 8}" y="${Y(d[1]) - 9}" fill="${C.n}" font-weight="700" font-size="15">${d[2]}</text>` : ''); });
+    (o.texts || []).forEach(t => { s += `<text x="${X(t.p[0])}" y="${Y(t.p[1])}" fill="${t.color || C.n}" font-weight="600">${T(t.t, lang)}</text>`; });
+    if (!bare) {
+      s += `<text x="${L + pw / 2}" y="${H - 8}" text-anchor="middle" fill="${C.ink}" font-weight="600">${T(o.xlabel, lang)}</text>`;
+      s += `<text transform="translate(16 ${Tp + ph / 2}) rotate(-90)" text-anchor="middle" fill="${C.ink}" font-weight="600">${T(o.ylabel, lang)}</text>`;
+    }
+    return s + '</svg>';
   }
 
   /* Κεκλιμένο επίπεδο με κιβώτιο και σχοινί: o = {angle,mass,rope} */

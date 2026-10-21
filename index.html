@@ -11,6 +11,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'glo
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" async></script>
 <script src="exams/figs.js"></script>
+<script src="exams/kef1.js"></script>
 <script src="exams/kef2.js"></script>
 <style>
 :root{
@@ -308,7 +309,7 @@ let _focus = null;
 function restoreFocus() { if (_focus) { const i = $('#numin'); if (i) { i.focus(); const l = i.value.length; i.setSelectionRange(l, l); } _focus = null; } }
 
 function home() {
-  const items = (window.EXAMS || []).map(e => {
+  const items = (window.EXAMS || []).slice().sort((a, b) => a.chapter - b.chapter).map(e => {
     const n = e.sections.reduce((a, s) => a + s.questions.length, 0);
     const m = e.sections.reduce((a, s) => a + s.minutes, 0);
     return `<button class="exitem" onclick="openExam('${e.id}')"><div><div class="n">${LANG==='el'?'Κεφάλαιο':'Chapitre'} ${e.chapter} — ${B(e.title)}</div>
