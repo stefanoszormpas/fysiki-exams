@@ -177,7 +177,17 @@ const UI = {
   rad: { fr: "Radians", el: "Ακτίνια" },
   numhint: { fr: "Saisis un nombre (virgule ou point). Tolérance ≈ 1–2 %.", el: "Γράψε αριθμό (κόμμα ή τελεία). Ανοχή ≈ 1–2%." },
   multihint: { fr: "Sélectionne toutes les bonnes réponses.", el: "Επίλεξε όλες τις σωστές απαντήσεις." },
-  g: { fr: "Utiliser g = 10 m/s²", el: "Χρησιμοποίησε g = 10 m/s²" }
+  g: { fr: "Utiliser g = 10 m/s²", el: "Χρησιμοποίησε g = 10 m/s²" },
+  pname: { fr: "Nom de l'élève", el: "Όνομα μαθητή" },
+  code: { fr: "Code des résultats", el: "Κωδικός αποτελεσμάτων" },
+  codehelp: { fr: "Envoie ce code (ou le lien) à ton professeur dans le chat.", el: "Στείλε αυτόν τον κωδικό (ή τον σύνδεσμο) στον καθηγητή σου στο chat." },
+  copycode: { fr: "Copier le code", el: "Αντιγραφή κωδικού" },
+  copylink: { fr: "Copier le lien", el: "Αντιγραφή συνδέσμου" },
+  copied: { fr: "Copié ✓", el: "Αντιγράφηκε ✓" },
+  openres: { fr: "Ouvrir les résultats d'un élève", el: "Άνοιγμα αποτελεσμάτων μαθητή" },
+  openhelp: { fr: "Colle le code ou le lien reçu de l'élève.", el: "Επικόλλησε τον κωδικό ή τον σύνδεσμο που έλαβες από τον μαθητή." },
+  openbtn: { fr: "Ouvrir", el: "Άνοιγμα" },
+  badcode: { fr: "Code invalide.", el: "Μη έγκυρος κωδικός." }
 };
 const CMP = [
   { fr: "La quantité A est plus grande.", el: "Η ποσότητα Α είναι μεγαλύτερη." },
@@ -201,7 +211,7 @@ function B(x, cls = '') {
 }
 
 /* ===== Κατάσταση ===== */
-const S = { phase: 'home', exam: null, sec: 0, qi: 0, answers: {}, flags: {}, deadline: 0, hideTimer: false,
+const S = { name: '', viewer: false, vdate: 0, vcode: '', verr: '', phase: 'home', exam: null, sec: 0, qi: 0, answers: {}, flags: {}, deadline: 0, hideTimer: false,
             confirm: false, mins: [], secDone: [], filter: 'all', modal: null, tick: null };
 
 function startTimer() {
@@ -245,6 +255,7 @@ function openExam(id) {
 }
 function beginExam() {
   const mins = [...document.querySelectorAll('[data-min]')].map(i => Math.max(1, parseInt(i.value) || 1));
+  S.name = ($('#sname') || {}).value || ''; S.viewer = false; S.vdate = 0;
   S.mins = mins; S.answers = {}; S.flags = {}; S.secDone = []; S.sec = 0; S.qi = 0;
   startSection(0);
 }
@@ -315,7 +326,11 @@ function home() {
     return `<button class="exitem" onclick="openExam('${e.id}')"><div><div class="n">${LANG==='el'?'Κεφάλαιο':'Chapitre'} ${e.chapter} — ${B(e.title)}</div>
       <div class="muted">${n} ${LANG==='el'?'ερωτήσεις':'questions'} · ${e.sections.length} ${LANG==='el'?'ενότητες':'sections'} · ${m} ${LANG==='el'?'λεπτά':'min'}</div></div><span class="btn pri">${L(UI.start)}</span></button>`;
   }).join('');
-  return `<div class="wrap"><div class="card"><h1>${L(UI.pick)}</h1><div class="exlist" style="margin-top:14px">${items || '<p class="muted">—</p>'}</div></div></div>`;
+  return `<div class="wrap"><div class="card"><h1>${L(UI.pick)}</h1><div class="exlist" style="margin-top:14px">${items || '<p class="muted">—</p>'}</div></div>
+    <div class="card"><h2>${L(UI.openres)}</h2><p class="muted" style="margin:4px 0 10px">${L(UI.openhelp)}</p>
+      <textarea id="vcode" rows="3" style="width:100%;font:inherit;padding:10px;border:1.5px solid var(--line);border-radius:10px" oninput="S.vcode=this.value">${esc(S.vcode)}</textarea>
+      ${S.verr ? `<p style="color:var(--bad);margin:6px 0 0">${L(UI.badcode)}</p>` : ''}
+      <div style="margin-top:10px"><button class="btn pri" onclick="loadViewer(S.vcode)">${L(UI.openbtn)}</button></div></div></div>`;
 }
 
 function intro() {
@@ -333,6 +348,7 @@ function intro() {
       ${li('Types de questions : une réponse, plusieurs réponses, réponse numérique, comparaison de deux quantités.', 'Τύποι ερωτήσεων: μία απάντηση, πολλαπλές απαντήσεις, αριθμητική απάντηση, σύγκριση δύο ποσοτήτων.')}
       ${li('Pas de points négatifs. Calculatrice et formulaire disponibles en haut. Utiliser <b>g = 10 m/s²</b>.', 'Δεν υπάρχει αρνητική βαθμολογία. Κομπιουτεράκι και τύποι διαθέσιμα πάνω. Χρησιμοποίησε <b>g = 10 m/s²</b>.')}
     </ul>
+    <h3 style="margin-top:14px">${B(UI.pname)}</h3><div class="field"><input id="sname" style="width:280px" autocomplete="off" value="${esc(S.name)}" oninput="S.name=this.value"></div>
     <h3 style="margin-top:14px">${B(UI.time)}</h3>${secs}
     <div style="display:flex;gap:10px;margin-top:18px"><button class="btn" onclick="S.phase='home';render()">← ${L(UI.home)}</button>
     <button class="btn pri" onclick="beginExam()">${L(UI.start)} →</button></div></div></div>`;
@@ -418,6 +434,7 @@ function results() {
   }).join('');
   return `<div class="wrap">
     <div class="card"><h1>${L(UI.results)} — ${L(S.exam.title)}</h1>
+      ${S.name || S.vdate ? `<div class="muted" style="margin-top:2px">${S.name ? '<b>' + esc(S.name) + '</b>' : ''}${S.name && S.vdate ? ' · ' : ''}${S.vdate ? new Date(S.vdate).toLocaleString('el-GR') : ''}</div>` : ''}
       <div class="score" style="margin-top:12px"><div class="big">${pct}<small> / 100</small></div>
         <div class="muted">${good} / ${tot} ${B(UI.correct).replace(/<span[^>]*>.*<\/span>/, '')}</div></div>
       <h3 style="margin-top:18px">${B(UI.bytopic)}</h3>${trow}
@@ -426,9 +443,48 @@ function results() {
         <button class="btn" onclick="S.filter='all';render()" ${S.filter==='all'?'style="background:#eef2f7"':''}>${L(UI.all)}</button>
         <button class="btn" onclick="S.filter='errors';render()" ${S.filter==='errors'?'style="background:#eef2f7"':''}>${L(UI.errors)}</button>
         <button class="btn" onclick="window.print()">${L(UI.print)}</button>
-        <button class="btn" onclick="openExam('${S.exam.id}')">${L(UI.retry)}</button>
-        <button class="btn" onclick="S.phase='home';render()">${L(UI.home)}</button></div></div>
+        ${S.viewer ? '' : `<button class="btn" onclick="openExam('${S.exam.id}')">${L(UI.retry)}</button>`}
+        <button class="btn" onclick="S.viewer=false;S.phase='home';render()">${L(UI.home)}</button></div></div>
+    ${S.viewer ? '' : codeCard()}
     ${list}</div>`;
+}
+
+/* ===== Κωδικός αποτελεσμάτων ===== */
+function encodeResult() {
+  const o = { e: S.exam.id, a: S.answers, n: S.name || '', d: S.vdate || Date.now() };
+  const bytes = new TextEncoder().encode(JSON.stringify(o)); let bin = '';
+  bytes.forEach(c => bin += String.fromCharCode(c));
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeResult(txt) {
+  let t = String(txt || '').trim(); const k = t.indexOf('r='); if (k >= 0) t = t.slice(k + 2);
+  t = t.replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(t); const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function loadViewer(txt) {
+  try {
+    const o = decodeResult(txt); const ex = (window.EXAMS || []).find(e => e.id === o.e);
+    if (!ex || typeof o.a !== 'object') throw new Error('bad');
+    S.exam = ex; S.answers = o.a; S.name = o.n || ''; S.vdate = o.d || 0; S.viewer = true; S.verr = '';
+    S.filter = 'all'; S.phase = 'results'; render(); window.scrollTo(0, 0); return true;
+  } catch (e) { S.verr = '1'; if (S.phase === 'home') render(); return false; }
+}
+function codeCard() {
+  if (!S.vdate) S.vdate = Date.now();
+  const code = encodeResult();
+  const link = location.href.split('#')[0] + '#r=' + code;
+  window._cc = { code, link };
+  return `<div class="card noprint"><h2>${L(UI.code)}</h2><p class="muted" style="margin:4px 0 10px">${L(UI.codehelp)}</p>
+    <textarea readonly rows="3" style="width:100%;font:12px ui-monospace,monospace;padding:10px;border:1.5px solid var(--line);border-radius:10px" onclick="this.select()">${code}</textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn pri" onclick="copyTxt(window._cc.code,this)">${L(UI.copycode)}</button>
+    <button class="btn" onclick="copyTxt(window._cc.link,this)">${L(UI.copylink)}</button></div></div>`;
+}
+function copyTxt(t, btn) {
+  const done = () => { const o = btn.textContent; btn.textContent = L(UI.copied); setTimeout(() => btn.textContent = o, 1600); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => fb());
+  else fb();
+  function fb() { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); done(); } catch (e) {} a.remove(); }
 }
 
 /* ===== Modals ===== */
@@ -478,6 +534,7 @@ function cCompute(expr, quiet) {
 }
 
 render();
+if (location.hash.startsWith('#r=')) loadViewer(location.hash);
 </script>
 </body>
 </html>
