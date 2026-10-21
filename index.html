@@ -294,9 +294,7 @@ function topbar(showTimer) {
     <div class="ttl">${t1}<small>${t2}</small></div>
     <div class="tools">
       ${showTimer ? `<button class="tbtn" onclick="S.hideTimer=!S.hideTimer;render()">${S.hideTimer ? L(UI.show) : L(UI.hide)}</button>
-        ${S.hideTimer ? '' : `<span id="timer" class="timer ${left<=300?'low':''}">${fmt(left)}</span>`}
-        <button class="tbtn" onclick="S.modal='formulas';render()">∑ ${L(UI.formulas)}</button>
-        <button class="tbtn" onclick="S.modal='calc';render()">▦ ${L(UI.calc)}</button>` : ''}
+        ${S.hideTimer ? '' : `<span id="timer" class="timer ${left<=300?'low':''}">${fmt(left)}</span>`}` : ''}
       ${ex && ex.lang && S.phase !== 'home' ? '' : langBar()}
     </div></div>`;
 }
@@ -354,7 +352,7 @@ function intro() {
       ${li('Tu peux naviguer entre les questions d\'une section, les marquer pour les revoir et utiliser l\'écran de revue.', 'Μπορείς να μετακινείσαι μεταξύ των ερωτήσεων της ενότητας, να τις σημειώνεις και να χρησιμοποιείς την οθόνη επισκόπησης.')}
       ${li('Après avoir terminé une section, tu ne peux plus y revenir.', 'Αφού τελειώσεις μια ενότητα, δεν μπορείς να επιστρέψεις.')}
       ${li('Types de questions : une réponse, plusieurs réponses, réponse numérique, comparaison de deux quantités.', 'Τύποι ερωτήσεων: μία απάντηση, πολλαπλές απαντήσεις, αριθμητική απάντηση, σύγκριση δύο ποσοτήτων.')}
-      ${li('Pas de points négatifs. Calculatrice et formulaire disponibles en haut. Utiliser <b>g = 10 m/s²</b>.', 'Δεν υπάρχει αρνητική βαθμολογία. Κομπιουτεράκι και τύποι διαθέσιμα πάνω. Χρησιμοποίησε <b>g = 10 m/s²</b>.')}
+      ${li('Pas de points négatifs. Calculatrice et formulaire non autorisés. Utiliser <b>g = 10 m/s²</b>.', 'Δεν υπάρχει αρνητική βαθμολογία. Δεν επιτρέπεται κομπιουτεράκι ούτε τυπολόγιο. Χρησιμοποίησε <b>g = 10 m/s²</b>.')}
     </ul>
     <h3 style="margin-top:14px">${B(UI.pname)}</h3><div class="field"><input id="sname" style="width:280px" autocomplete="off" value="${esc(S.name)}" oninput="S.name=this.value"></div>
     <h3 style="margin-top:14px">${B(UI.time)}</h3>${secs}
