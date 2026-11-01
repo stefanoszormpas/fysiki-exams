@@ -134,8 +134,8 @@
             },
             answer: 0,
             explain: {
-              fr: R`\(d=\dfrac{mv^2}{2F}\propto v^2\). Si \(d_{15}=d\), alors A \(=d_{30}=4d\) et B \(=2d\). Donc A \(>\) B.`,
-              el: R`\(d=\dfrac{mv^2}{2F}\propto v^2\). Αν \(d_{15}=d\), τότε Α \(=d_{30}=4d\) και Β \(=2d\). Άρα Α \(>\) Β.`
+              fr: R`\(d=\dfrac{mv^2}{2F}\propto v^2\). Si \(d_{15}=d\), alors A \(=d_{30}=4d\) et B \(=2d\). Donc A \(\gt \) B.`,
+              el: R`\(d=\dfrac{mv^2}{2F}\propto v^2\). Αν \(d_{15}=d\), τότε Α \(=d_{30}=4d\) και Β \(=2d\). Άρα Α \(\gt \) Β.`
             }
           }
         ]
@@ -311,8 +311,8 @@
     stem: { fr: R`Le chariot a une masse de \(3\ \text{kg}\).<br><b>Quantité A :</b> intensité de la force résultante entre \(t=0\) et \(t=4\ \text{s}\).<br><b>Quantité B :</b> intensité de la force résultante entre \(t=4\ \text{s}\) et \(t=8\ \text{s}\).`,
             el: R`Το βαγόνι έχει μάζα 3 kg.<br><b>Ποσότητα Α:</b> μέτρο της συνισταμένης δύναμης από \(t=0\) έως \(t=4\) s.<br><b>Ποσότητα Β:</b> μέτρο της συνισταμένης δύναμης από \(t=4\) s έως \(t=8\) s.` },
     answer: 0,
-    explain: { fr: R`Entre 0 et 4 s : \(a=2\ \text{m/s}^2\), donc \(F=ma=6\ \text{N}\). Entre 4 et 8 s : vitesse constante, \(a=0\), donc \(F=0\). A \(>\) B.`,
-               el: R`Από 0 έως 4 s: \(a=2\) m/s², άρα \(F=ma=6\) N. Από 4 έως 8 s: σταθερή ταχύτητα, \(a=0\), άρα \(F=0\). Α \(>\) Β.` }
+    explain: { fr: R`Entre 0 et 4 s : \(a=2\ \text{m/s}^2\), donc \(F=ma=6\ \text{N}\). Entre 4 et 8 s : vitesse constante, \(a=0\), donc \(F=0\). A \(\gt \) B.`,
+               el: R`Από 0 έως 4 s: \(a=2\) m/s², άρα \(F=ma=6\) N. Από 4 έως 8 s: σταθερή ταχύτητα, \(a=0\), άρα \(F=0\). Α \(\gt \) Β.` }
   };
   const F4 = {
     id: "f4", type: "numeric", topic: GT, diff: 2, unit: "N·s", figure: figFT,

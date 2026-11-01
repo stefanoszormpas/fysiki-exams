@@ -243,8 +243,8 @@
               { fr: "On ne peut pas le savoir", el: "Δεν μπορούμε να το γνωρίζουμε" }
             ],
             answer: 2,
-            explain: { fr: R`\(\vec a\) a une composante normale (vers le centre) et une composante tangentielle de sens opposé à \(\vec v\) : \(a_\tau<0\), donc la norme de \(\vec v\) diminue.`,
-                       el: R`Η \(\vec a\) έχει κάθετη συνιστώσα (προς το κέντρο) και εφαπτομενική αντίθετη από το \(\vec v\): \(a_\tau<0\), άρα το μέτρο του \(\vec v\) μειώνεται.` }
+            explain: { fr: R`\(\vec a\) a une composante normale (vers le centre) et une composante tangentielle de sens opposé à \(\vec v\) : \(a_\tau\lt 0\), donc la norme de \(\vec v\) diminue.`,
+                       el: R`Η \(\vec a\) έχει κάθετη συνιστώσα (προς το κέντρο) και εφαπτομενική αντίθετη από το \(\vec v\): \(a_\tau\lt 0\), άρα το μέτρο του \(\vec v\) μειώνεται.` }
           },
           {
             id: "at2", type: "multi", topic: TOP.atn, diff: 3,
