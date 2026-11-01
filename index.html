@@ -7,9 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <script>
-window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'global' }, startup: { typeset: false } };
+/* MathJax 4: οι μεγάλες πράξεις σπάνε αυτόματα σε νέα γραμμή στο κινητό */
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, output: { linebreaks: { inline: true, width: '100%' }, displayOverflow: 'linebreak' }, startup: { typeset: false } };
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js" async></script>
 <script src="exams/figs.js"></script>
 <script src="exams/kef1.js"></script>
 <script src="exams/kef2.js"></script>
