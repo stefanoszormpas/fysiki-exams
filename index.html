@@ -14,6 +14,7 @@ window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'glo
 <script src="exams/kef1.js"></script>
 <script src="exams/kef2.js"></script>
 <script src="exams/gr-b1.js"></script>
+<script src="exams/pan-kr1.js"></script>
 <style>
 :root{
   --navy:#1c3a5e; --teal:#0f6e6b; --amber:#a9631a;
@@ -119,6 +120,7 @@ h1{font-size:1.5rem} h2{font-size:1.2rem} h3{font-size:1.02rem}
   .top,.foot,.noprint{display:none!important}
   body{background:#fff} .card{break-inside:avoid;border-color:#bbb}
 }
+.pantag{display:table;font-family:Inter,system-ui,sans-serif;font-size:12px;font-weight:600;color:var(--muted);background:#eef2f7;border-radius:999px;padding:2px 10px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -423,7 +425,7 @@ function results() {
   all.forEach(o => { o.ok = isCorrect(o.q, S.answers[o.q.id]); o.has = hasAns(o.q); });
   const tot = all.length, good = all.filter(o => o.ok).length, pct = Math.round(100 * good / tot);
   const topics = {};
-  all.forEach(o => { const k = o.q.topic.fr; (topics[k] = topics[k] || { t: o.q.topic, n: 0, g: 0 }); topics[k].n++; if (o.ok) topics[k].g++; });
+  all.forEach(o => { const k = typeof o.q.topic === 'string' ? o.q.topic : o.q.topic.fr; (topics[k] = topics[k] || { t: o.q.topic, n: 0, g: 0 }); topics[k].n++; if (o.ok) topics[k].g++; });
   const trow = Object.values(topics).map(t => { const p = Math.round(100 * t.g / t.n); return `<div class="trow"><div>${B(t.t)}</div><div class="bar"><i class="${p<50?'lo':p<75?'mid':''}" style="width:${p}%"></i></div><b>${p}%</b></div>`; }).join('');
   const secs = S.exam.sections.map((s, si) => { const l = all.filter(o => o.si === si); const g = l.filter(o => o.ok).length; return `<div class="trow"><div>${B(s.name)}</div><div class="bar"><i style="width:${Math.round(100*g/l.length)}%"></i></div><b>${g}/${l.length}</b></div>`; }).join('');
   let n = 0;
@@ -541,6 +543,8 @@ function cCompute(expr, quiet) {
 
 render();
 if (location.hash.startsWith('#r=')) loadViewer(location.hash);
+/* άμεσο άνοιγμα εξέτασης από QR: index.html#e=<id> */
+else if (location.hash.startsWith('#e=')) { const id = decodeURIComponent(location.hash.slice(3)); if ((window.EXAMS || []).some(e => e.id === id)) openExam(id); }
 </script>
 </body>
 </html>
