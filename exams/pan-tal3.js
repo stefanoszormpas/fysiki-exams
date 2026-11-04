@@ -62,11 +62,11 @@
             explain: R`\(\alpha=-\omega^2A\eta\mu\omega t=-\omega^2x\) και \(F=m\alpha=-m\omega^2x\).`
           },
           {
-            id: "b4", type: "multi", topic: TOP.en, diff: 2,
-            stem: tag("Ημερήσια 2009") + R`Υλικό σημείο εκτελεί ΑΑΤ πλάτους \(A\) και κυκλικής συχνότητας \(\omega\), με μέγιστη ταχύτητα \(\upsilon_0\) και μέγιστη επιτάχυνση \(\alpha_0\). Αν \(x,\upsilon,\alpha\) είναι τα μέτρα απομάκρυνσης, ταχύτητας και επιτάχυνσης, σε κάθε χρονική στιγμή ισχύει <span class="muted">(μπορεί να είναι σωστές περισσότερες από μία)</span>`,
-            options: [R`\(\upsilon^2=\omega^2(A^2-x^2)\)`, R`\(x^2=\omega^2(\alpha_0^2-\alpha^2)\)`, R`\(\alpha^2=\omega^2(\upsilon_0^2-\upsilon^2)\)`],
-            answer: [0, 2],
-            explain: R`Από ΑΔΕ: \(\tfrac12m\upsilon^2+\tfrac12m\omega^2x^2=\tfrac12m\omega^2A^2\Rightarrow\upsilon^2=\omega^2(A^2-x^2)\). Με \(\alpha=\omega^2x\), \(\alpha_0=\omega^2A\), \(\upsilon_0=\omega A\): \(\omega^2(\upsilon_0^2-\upsilon^2)=\omega^4x^2=\alpha^2\), άρα και η (γ) ισχύει. Η (β) δεν ισχύει: θα έπρεπε \(x^2=(\alpha_0^2-\alpha^2)/\omega^4\).`
+            id: "b4", type: "single", topic: TOP.en, diff: 2,
+            stem: tag("Ημερήσια 2009") + R`Υλικό σημείο εκτελεί ΑΑΤ πλάτους \(A\) και κυκλικής συχνότητας \(\omega\), με μέγιστη ταχύτητα \(\upsilon_0\) και μέγιστη επιτάχυνση \(\alpha_0\). Αν \(x,\upsilon,\alpha\) είναι τα μέτρα απομάκρυνσης, ταχύτητας και επιτάχυνσης, σε κάθε χρονική στιγμή ισχύει<br><span class="muted">Στις Πανελλαδικές πρέπει και να αιτιολογήσεις. Σκέψου την αιτιολόγηση πριν απαντήσεις.</span>`,
+            options: [R`\(\upsilon^2=\omega(A^2-x^2)\)`, R`\(x^2=\omega^2(\alpha_0^2-\alpha^2)\)`, R`\(\alpha^2=\omega^2(\upsilon_0^2-\upsilon^2)\)`],
+            answer: 2,
+            explain: R`Με \(\alpha=\omega^2x\), \(\upsilon_0=\omega A\) και \(\upsilon^2=\omega^2(A^2-x^2)\): \(\omega^2(\upsilon_0^2-\upsilon^2)=\omega^2\cdot\omega^2x^2=\alpha^2\). Η (α) δεν ισχύει: λείπει ένα \(\omega\) (σωστό \(\upsilon^2=\omega^2(A^2-x^2)\)). Η (β) δεν ισχύει: σωστό \(x^2=(\alpha_0^2-\alpha^2)/\omega^4\).`
           },
           {
             id: "b5", type: "single", topic: TOP.kin, diff: 2,
