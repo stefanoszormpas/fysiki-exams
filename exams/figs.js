@@ -66,7 +66,7 @@ window.FIG = (function () {
     s += `</g>`;
     s += `<path d="M ${A[0] + 60} ${A[1]} A 60 60 0 0 0 ${A[0] + 60 * Math.cos(r)} ${A[1] - 60 * Math.sin(r)}" fill="none" stroke="${C.ink}"/>`;
     s += `<text x="${A[0] + 72}" y="${A[1] - 8}" fill="${C.ink}" font-weight="600">${ang}°</text>`;
-    s += `<text x="${(B[0] + 30) / 2 + 40}" y="${H - 6}" fill="${C.axis}" text-anchor="middle">${T({ fr: 'sans frottement', el: 'χωρίς τριβή' }, lang)}</text></svg>`;
+    s += `<text x="${(B[0] + 30) / 2 + 40}" y="${H - 6}" fill="${C.axis}" text-anchor="middle">${T(o.note || { fr: 'sans frottement', el: 'χωρίς τριβή' }, lang)}</text></svg>`;
     return s;
   }
 
