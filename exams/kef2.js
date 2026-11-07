@@ -272,7 +272,7 @@
     formulas: [
       { t: { fr: "Constante", el: "Σταθερά" }, f: R`g = 10 m/s²` },
       { t: { fr: "2<sup>e</sup> loi de Newton", el: "2ος νόμος Νεύτωνα" }, f: R`\(\sum\vec F=m\vec a\)` },
-      { t: { fr: "Poids, frottement", el: "Βάρος, τριβή" }, f: R`\(P=mg\) · \(F_f=\mu R\)` },
+      { t: { fr: "Poids, frottement", el: "Βάρος, τριβή" }, f: R`\(w=mg\) · \(F_f=\mu R\)` },
       { t: { fr: "Plan incliné (sans frottement)", el: "Κεκλιμένο (χωρίς τριβή)" }, f: R`\(a=g\sin\alpha\)` },
       { t: { fr: "Travail d'une force constante", el: "Έργο σταθερής δύναμης" }, f: R`\(W=F\,d\cos\alpha\)` },
       { t: { fr: "Énergie cinétique, TEC", el: "Κινητική ενέργεια, ΘΜΚΕ" }, f: R`\(E_c=\tfrac12mv^2\) · \(\Delta E_c=\sum W\)` },
