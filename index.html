@@ -11,6 +11,7 @@
 window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, output: { linebreaks: { inline: true, width: '100%' }, displayOverflow: 'linebreak' }, startup: { typeset: false } };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js" async></script>
+<script src="config.js"></script>
 <script src="exams/figs.js"></script>
 <script src="exams/kef1.js"></script>
 <script src="exams/kef2.js"></script>
@@ -280,7 +281,7 @@ function B(x, cls = '') {
 }
 
 /* ===== Κατάσταση ===== */
-const S = { name: '', viewer: false, vdate: 0, vcode: '', verr: '', phase: 'home', exam: null, sec: 0, qi: 0, answers: {}, flags: {}, deadline: 0, hideTimer: false,
+const S = { name: '', tmima: '', startedAt: 0, sent: '', viewer: false, vdate: 0, vcode: '', verr: '', phase: 'home', exam: null, sec: 0, qi: 0, answers: {}, flags: {}, deadline: 0, hideTimer: false,
             confirm: false, mins: [], secDone: [], filter: 'all', modal: null, tick: null };
 
 function startTimer() {
@@ -322,9 +323,18 @@ function openExam(id) {
   S.mins = S.exam.sections.map(s => s.minutes);
   S.phase = 'intro'; render();
 }
+const SENDS = () => !!(S.exam && window.EXAM_ENDPOINT && window.SEND_EXAMS && window.SEND_EXAMS.test(S.exam.id));
 function beginExam() {
+  if (SENDS()) {
+    const nm = (($('#sname') || {}).value || '').trim().replace(/\s+/g, ' '), tm = (($('#stmima') || {}).value || '').trim();
+    if (nm.split(' ').length < 2) { alert('Γράψε ονοματεπώνυμο (όνομα και επώνυμο) για να σταλούν οι απαντήσεις σου στον καθηγητή.'); return; }
+    S.name = nm; S.tmima = tm;
+    try { localStorage.setItem('fx_student', JSON.stringify({ n: nm, t: tm })); } catch (e) {}
+  }
+  S.startedAt = Date.now(); S.sent = '';
   const mins = [...document.querySelectorAll('[data-min]')].map(i => Math.max(1, parseInt(i.value) || 1));
-  S.name = ($('#sname') || {}).value || ''; S.viewer = false; S.vdate = 0;
+  if (!SENDS()) S.name = ($('#sname') || {}).value || '';
+  S.viewer = false; S.vdate = 0;
   S.mins = mins; S.answers = {}; S.flags = {}; S.secDone = []; S.sec = 0; S.qi = 0;
   startSection(0);
 }
@@ -337,6 +347,7 @@ function finishSection() {
   clearInterval(S.tick); S.secDone[S.sec] = true; S.confirm = false;
   S.phase = (S.sec + 1 < S.exam.sections.length) ? 'secEnd' : 'results';
   S.filter = 'all'; render(); window.scrollTo(0, 0);
+  if (S.phase === 'results' && SENDS() && !S.viewer) sendResult();
 }
 function setAns(q, v) {
   if (q.type === 'multi') {
@@ -422,7 +433,7 @@ function intro() {
       ${li('Types de questions : une réponse, plusieurs réponses, réponse numérique, comparaison de deux quantités.', 'Τύποι ερωτήσεων: μία απάντηση, πολλαπλές απαντήσεις, αριθμητική απάντηση, σύγκριση δύο ποσοτήτων.')}
       ${li('Pas de points négatifs. Calculatrice et formulaire non autorisés. Utiliser <b>g = 10 m/s²</b>.', 'Δεν υπάρχει αρνητική βαθμολογία. Δεν επιτρέπεται κομπιουτεράκι ούτε τυπολόγιο. Χρησιμοποίησε <b>g = 10 m/s²</b>.')}
     </ul>
-    <h3 style="margin-top:14px">${B(UI.pname)}</h3><div class="field"><input id="sname" style="width:280px" autocomplete="off" value="${esc(S.name)}" oninput="S.name=this.value"></div>
+    ${SENDS() ? sendFields() : `<h3 style="margin-top:14px">${B(UI.pname)}</h3><div class="field"><input id="sname" style="width:280px" autocomplete="off" value="${esc(S.name)}" oninput="S.name=this.value"></div>`}
     <h3 style="margin-top:14px">${B(UI.time)}</h3>${secs}
     <div style="display:flex;gap:10px;margin-top:18px"><button class="btn" onclick="S.phase='home';render()">← ${L(UI.home)}</button>
     <button class="btn pri" onclick="beginExam()">${L(UI.start)} →</button></div></div></div>`;
@@ -519,8 +530,51 @@ function results() {
         <button class="btn" onclick="window.print()">${L(UI.print)}</button>
         ${S.viewer ? '' : `<button class="btn" onclick="openExam('${S.exam.id}')">${L(UI.retry)}</button>`}
         <button class="btn" onclick="S.viewer=false;S.phase='home';render()">${L(UI.home)}</button></div></div>
-    ${S.viewer ? '' : codeCard()}
+    ${S.viewer ? '' : (SENDS() ? sendCard() : codeCard())}
     ${list}</div>`;
+}
+
+/* ===== Αποστολή στον καθηγητή (Google Apps Script → Sheet + email) ===== */
+function sendFields() {
+  if (!S.name) { try { const o = JSON.parse(localStorage.getItem('fx_student') || '{}'); S.name = o.n || ''; S.tmima = o.t || ''; } catch (e) {} }
+  return `<h3 style="margin-top:14px">Ονοματεπώνυμο</h3><div class="field"><input id="sname" style="width:280px" autocomplete="off" value="${esc(S.name)}" oninput="S.name=this.value" placeholder="π.χ. Μαρία Παπαδοπούλου"></div>
+    <h3 style="margin-top:10px">Τμήμα</h3><div class="field"><input id="stmima" style="width:140px" autocomplete="off" value="${esc(S.tmima)}" oninput="S.tmima=this.value" placeholder="π.χ. Γ1"></div>
+    <p class="muted" style="margin:6px 0 0">Στο τέλος οι απαντήσεις σου στέλνονται αυτόματα στον καθηγητή σου.</p>`;
+}
+const ansText = (q, a) => {
+  if (a === undefined || a === null || (Array.isArray(a) && !a.length) || (q.type === 'numeric' && String(a).trim() === '')) return '';
+  if (q.type === 'single' || q.type === 'compare') return 'ABCDE'[a];
+  if (q.type === 'multi') return [...a].sort().map(i => 'ABCDE'[i]).join(', ');
+  return String(a).trim() + (q.unit ? ' ' + q.unit : '');
+};
+const plain = x => String(L(x) || '').replace(/<[^>]*>/g, '').replace(/\\\(|\\\)/g, '').trim();
+async function sendResult() {
+  if (S.sent === 'ok' || S.sent === 'busy') return;
+  S.sent = 'busy'; render();
+  const items = []; let n = 0;
+  S.exam.sections.forEach(s => s.questions.forEach(q => {
+    n++; const a = S.answers[q.id];
+    items.push({ n, sec: plain(s.name), topic: plain(q.topic), yours: ansText(q, a), right: ansText(q, q.answer), ok: isCorrect(q, a) });
+  }));
+  const good = items.filter(i => i.ok).length;
+  if (!S.vdate) S.vdate = Date.now();
+  const link = location.href.split('#')[0] + '#r=' + encodeResult();
+  const payload = { exam: S.exam.id, title: plain(S.exam.title), name: S.name, tmima: S.tmima, startedAt: S.startedAt, finishedAt: Date.now(),
+                    good, tot: items.length, pct: Math.round(100 * good / items.length), items, link };
+  try {
+    const r = await fetch(window.EXAM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+    const res = await r.json();
+    if (!res.ok) throw new Error(res.error || 'error');
+    S.sent = 'ok';
+  } catch (e) { S.sent = 'err'; }
+  if (S.phase === 'results') render();
+}
+function sendCard() {
+  const msg = S.sent === 'ok' ? '<b style="color:var(--ok, #1b7f4b)">✓ Οι απαντήσεις σου στάλθηκαν στον καθηγητή σου.</b>'
+    : S.sent === 'err' ? '<b style="color:var(--bad)">Δεν έγινε η αποστολή.</b> Έλεγξε τη σύνδεση στο ίντερνετ και πάτησε «Αποστολή ξανά».'
+    : 'Αποστολή των απαντήσεων στον καθηγητή…';
+  return `<div class="card noprint"><h2>Αποστολή στον καθηγητή</h2><p style="margin:6px 0 0">${msg}</p>
+    ${S.sent === 'err' ? `<div style="margin-top:10px"><button class="btn pri" onclick="sendResult()">Αποστολή ξανά</button></div>` : ''}</div>`;
 }
 
 /* ===== Κωδικός αποτελεσμάτων ===== */
